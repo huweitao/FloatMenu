@@ -269,7 +269,7 @@ const NSInteger EnlargeRatio = 4;
                 x = itemL;
                 y = 0.0;
                 icon = [Base64Images homeImage];
-                title = @"change region";
+                title = @"Home";
             }
                 break;
             case 1:
@@ -277,7 +277,7 @@ const NSInteger EnlargeRatio = 4;
                 x = itemL * 2;
                 y = itemL;
                 icon = [Base64Images circleImage];
-                title = @"logout";
+                title = @"Circle";
             }
                 break;
             case 2:
@@ -285,7 +285,7 @@ const NSInteger EnlargeRatio = 4;
                 x = itemL;
                 y = itemL * 2;
                 icon = [Base64Images cupImage];
-                title = @"productID";
+                title = @"Cup";
             }
                 break;
             case 3:
@@ -293,7 +293,7 @@ const NSInteger EnlargeRatio = 4;
                 x = 0.0;
                 y = itemL;
                 icon = [Base64Images lightImage];
-                title = @"switchFlag";
+                title = @"Light";
             }
                 break;
             default:
@@ -307,62 +307,6 @@ const NSInteger EnlargeRatio = 4;
         item.icon = icon;
         item.handler = ^(NSInteger index) {
             NSLog(@"click at %ld",(long)index);
-            switch (index) {
-                case 0:
-                {
-                    NSString *chgRegion = @"CN";
-                    if ([chgRegion isEqualToString:[DTContextGet() currentRegion]]) {
-                        chgRegion = @"MO";
-                    }
-                    [DTContextGet() startRegionChange:chgRegion];
-                    
-                }
-                    break;
-                case 1:
-                {
-                    id<SSAuthService> authService = [DTContextGet() findServiceByName:@"SSAuthService"];
-                    [authService doLogout];
-                    //
-                    id<SAAccountService> accountService = [DTContextGet() findServiceByName:@"SAAccountService"];
-                    SAUserInfo *userInfo = accountService.userInfo;
-                    NSDictionary *extraInfo = @{@"loginSource":@"loginintercept"};
-                    NSString *loginId = userInfo.loginId;
-                    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-                    if(loginId) {
-                        [dict setValue:loginId forKey:@"loginId"];
-                    }
-                    if(extraInfo) {
-                        [dict setValue:extraInfo forKey:@"extraInfo"];
-                    }
-                    [DTContextGet() startApplication:@"20000008" params:dict animated:YES];
-                }
-                    break;
-                case 2:
-                {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        NSString *productID = [APApplicationInfo productId];
-                        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"ProdcutID" message:productID delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-                        [alert show];
-                    });
-                }
-                    break;
-                case 3:
-                {
-                    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-                    NSString *serviceType = nil;
-                    NSString *path = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
-                    if ([[NSFileManager defaultManager] fileExistsAtPath: path]) {
-                        serviceType = [userDefaults objectForKey:@"kServiceSelected"];
-                    }
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Dev environment" message:serviceType delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-                        [alert show];
-                    });
-                }
-                    break;
-                default:
-                    break;
-            }
         };
         [itemList addObject:item];
     }
