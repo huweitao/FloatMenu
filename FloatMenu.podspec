@@ -15,7 +15,7 @@ Pod::Spec.new do |spec|
   #  summary should be tweet-length, and the description more in depth.
   #
 
-  spec.name         = "FloatMenu.podspec"
+  spec.name         = "FloatMenu"
   spec.version      = "1.0.0"
   spec.summary      = "FloatMenu is like assitive touch, you can configure touch actions in your way"
 
