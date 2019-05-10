@@ -40,14 +40,15 @@
 
 #pragma mark - Item相关操作
 
-- (void)addItemWithTitle:(NSString *)title icon:(UIImage *)icon frame:(CGRect)frame handler:(FloatItemHandler)handler
+- (void)resetItemAtIndex:(NSInteger)index title:(NSString *)title icon:(UIImage *)icon handler:(FloatItemHandler)handler
 {
-    FloatItem *item = [FloatItem new];
-    item.title = title;
-    item.icon = icon;
-    item.handler = handler;
-    item.itemFrame = frame;
-    [self addItem:item];
+    if (self.padItems.count == 0 || index >= self.padItems.count) {
+        return;
+    }
+    FloatItem *item = [self.padItems objectAtIndex:index];
+    item.title = title?:item.title;
+    item.icon = icon?:item.icon;
+    item.handler = handler?:item.handler;
 }
 
 
