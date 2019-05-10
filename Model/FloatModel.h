@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface FloatModel : NSObject
 
 // Item相关操作
-- (void)resetItemAtIndex:(NSInteger)index title:(NSString *)title icon:(UIImage *)icon handler:(FloatItemHandler)handler;
+- (void)resetItemAtIndex:(NSInteger)index title:(nullable NSString *)title icon:(nullable UIImage *)icon handler:(nullable FloatItemHandler)handler;
 - (void)addItemList:(NSArray *)items;
 - (void)addItem:(FloatItem *)item;
 - (void)removeItemAtIndex:(NSInteger)index;

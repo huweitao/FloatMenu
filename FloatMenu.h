@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)show;
 + (void)hide;
++ (void)setupItemIndex:(NSInteger)index title:(nullable NSString *)title icon:(nullable UIImage *)icon clickHandler:(nullable void (^)(NSInteger index))handler;
 
 @end
 

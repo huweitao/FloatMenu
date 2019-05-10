@@ -40,7 +40,7 @@
 
 #pragma mark - Item相关操作
 
-- (void)resetItemAtIndex:(NSInteger)index title:(NSString *)title icon:(UIImage *)icon handler:(FloatItemHandler)handler
+- (void)resetItemAtIndex:(NSInteger)index title:(nullable NSString *)title icon:(nullable UIImage *)icon handler:(nullable FloatItemHandler)handler
 {
     if (self.padItems.count == 0 || index >= self.padItems.count) {
         return;

@@ -223,6 +223,15 @@ const NSInteger EnlargeRatio = 4;
     }
 }
 
++ (void)setupItemIndex:(NSInteger)index title:(nullable NSString *)title icon:(nullable UIImage *)icon clickHandler:(nullable void (^)(NSInteger index))handler
+{
+    FloatMenu *fMenu = [self createFloatMenu];
+    if (!fMenu) {
+        return;
+    }
+    [fMenu.itemsModel resetItemAtIndex:index title:title icon:icon handler:handler];
+}
+
 + (FloatMenu *)createFloatMenu
 {
     UIWindow *keyWindow = [self getCurrentKeyWindow];
