@@ -75,12 +75,10 @@ const NSInteger EnlargeRatio = 4;
     self.frame = frame;
 }
 
-
 -(CGFloat)height
 {
     return self.frame.size.height;
 }
-
 
 - (void)setCenterX:(CGFloat)centerX
 {
@@ -156,7 +154,7 @@ const NSInteger EnlargeRatio = 4;
 {
     if (self = [super initWithFrame:frame]) {
         self.userInteractionEnabled = YES;
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onShouldShrinkMenu:) name:kShrinkMenu object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onShouldShrinkMenu:) name:[kShrinkMenu copy] object:nil];
     }
     return self;
 }
@@ -199,7 +197,6 @@ const NSInteger EnlargeRatio = 4;
     [fMenu hideDefaultItemViews];
 }
 
-#pragma mark - 加一个timer check最上层的window
 + (void)show
 {
     UIWindow *keyWindow = [self getCurrentKeyWindow];
