@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+extern const NSString * _Nonnull kShrinkMenu;
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void(^FloatItemHandler)(NSInteger index);

@@ -70,6 +70,7 @@
     if (self.item && self.item.handler) {
         self.item.handler(self.item.index);
     }
+    [[NSNotificationCenter defaultCenter] postNotificationName:kShrinkMenu object:nil];
 }
 
 #pragma mark - Getter

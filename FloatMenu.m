@@ -11,7 +11,7 @@
 #define MScreenWidth  [[UIScreen mainScreen] bounds].size.width
 #define MScreenHeight [[UIScreen mainScreen] bounds].size.height
 
-//
+// const
 const CGFloat MenuLength = 66;
 const NSInteger EnlargeRatio = 4;
 
@@ -156,8 +156,14 @@ const NSInteger EnlargeRatio = 4;
 {
     if (self = [super initWithFrame:frame]) {
         self.userInteractionEnabled = YES;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onShouldShrinkMenu:) name:kShrinkMenu object:nil];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - Public
@@ -368,6 +374,7 @@ const NSInteger EnlargeRatio = 4;
     } completion:^(BOOL finished) {
         self.image = [Base64Images circleImage];
         [self hideDefaultItemViews];
+        self.isLargeSize = !self.isLargeSize;
     }];
 }
 
@@ -381,7 +388,17 @@ const NSInteger EnlargeRatio = 4;
     } completion:^(BOOL finished) {
         self.image = nil;
         [self showDefaultItemViews];
+        self.isLargeSize = !self.isLargeSize;
     }];
+}
+
+#pragma mark - Notification
+
+- (void)onShouldShrinkMenu:(NSNotification *)notify
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self shrinkView];
+    });
 }
 
 #pragma mark - Getter
@@ -447,7 +464,6 @@ const NSInteger EnlargeRatio = 4;
         else {
             [self enlargeView];
         }
-        self.isLargeSize = !self.isLargeSize;
     }
     else if (self.isLargeSize) {
         return;

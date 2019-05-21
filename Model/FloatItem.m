@@ -8,6 +8,9 @@
 
 #import "FloatItem.h"
 
+// const
+const NSString *kShrinkMenu = @"com.should.shrink.menu";
+
 @implementation FloatItem
 
 @end
