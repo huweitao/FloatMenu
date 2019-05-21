@@ -363,6 +363,8 @@ const NSInteger EnlargeRatio = 4;
         // corner radious
         self.layer.cornerRadius = MenuLength / 2.0;
         self.layer.masksToBounds = YES;
+        // make menu back to screen bounds
+        self.origin = [self createFormatMoveFrom:self.origin];
     } completion:^(BOOL finished) {
         self.image = [Base64Images circleImage];
         [self hideDefaultItemViews];
@@ -412,6 +414,10 @@ const NSInteger EnlargeRatio = 4;
         return;
     }
     
+    if (self.isLargeSize) {
+        return;
+    }
+    
     UITouch *touch = [touches anyObject];
     
     CGPoint endP = [touch locationInView: keyW];
@@ -430,10 +436,9 @@ const NSInteger EnlargeRatio = 4;
         return;
     }
     
-    // 判断view位置
+    // self current position
     UITouch *touch = [touches anyObject];
     CGPoint point = [touch locationInView: keyW];
-    // 判断开始点和结束点是否是同一点,  同一点表示为点击, 否则表示移动
     if (CGPointEqualToPoint(point, self.beginPoint)) {
         // click
         if (self.isLargeSize) {
@@ -444,41 +449,59 @@ const NSInteger EnlargeRatio = 4;
         }
         self.isLargeSize = !self.isLargeSize;
     }
+    else if (self.isLargeSize) {
+        return;
+    }
     else {
-        if (point.y < self.height && point.x > MScreenWidth - self.width) {
-            self.origin = CGPointMake(MScreenWidth - self.width, 0);
-            return;
+        self.origin = [self createFormatMoveFrom:point];
+    }
+}
+
+- (CGPoint)createFormatMoveFrom:(CGPoint)point
+{
+    // move
+    if (point.y < self.height && point.x > MScreenWidth - self.width) {
+        // top right
+        return CGPointMake(MScreenWidth - self.width, 0);
+    }
+    if (point.y > MScreenHeight - self.height && point.x > MScreenWidth - self.width){
+        // bottom right
+        return CGPointMake(MScreenWidth - self.width, MScreenHeight - self.height);
+    }
+    if (point.x < self.width * 0.5  && point.y < self.height) {
+        // top left
+        return CGPointMake(0,0);
+    }
+    if (point.y > MScreenHeight - self.height && point.x < self.width * 0.5) {
+        // bottom left
+        return CGPointMake(0,MScreenHeight - self.height);
+    }
+    
+    if (point.x < MScreenWidth * 0.5) {
+        // mid-x left
+        if (point.y < self.height) {
+            return CGPointMake(point.x - self.width * 0.5, 0);
         }
-        if (point.y > MScreenHeight - self.height && point.x > MScreenWidth - self.width){
-            self.origin = CGPointMake(MScreenWidth - self.width, MScreenHeight - self.height);
-            return;
+        else if (point.y > MScreenHeight - self.height) {
+            return CGPointMake(point.x - self.width * 0.5, MScreenHeight - self.height);
         }
-        if (point.x < self.width * 0.5  && point.y < self.height) {
-            self.origin = CGPointMake(0,0);
-            return;
-        }
-        if (point.y > MScreenHeight - self.height && point.x < self.width * 0.5) {
-            self.origin = CGPointMake(0,MScreenHeight - self.height);
-            return;
-        }
-        if (point.x < MScreenWidth * 0.5) {
-            if (point.y < self.height) {
-                self.origin = CGPointMake(point.x - self.width * 0.5, 0);
-            }else if (point.y > MScreenHeight - self.height){
-                self.origin = CGPointMake(point.x - self.width * 0.5, MScreenHeight - self.height);
-            }else{
-                self.origin = CGPointMake(0, point.y- self.height * 0.5);
-            }
-        }else{
-            if (point.y < self.height) {
-                self.origin = CGPointMake(point.x - self.width * 0.5, 0);
-            }else if (point.y > MScreenHeight - self.height){
-                self.origin = CGPointMake(point.x - self.width * 0.5, MScreenHeight - self.height);
-            }else{
-                self.origin = CGPointMake(MScreenWidth - self.width, point.y- self.height * 0.5);
-            }
+        else {
+            return CGPointMake(0, point.y- self.height * 0.5);
         }
     }
+    else {
+        // mid-x right
+        if (point.y < self.height) {
+            return CGPointMake(point.x - self.width * 0.5, 0);
+        }
+        else if (point.y > MScreenHeight - self.height) {
+            return CGPointMake(point.x - self.width * 0.5, MScreenHeight - self.height);
+        }
+        else {
+            return CGPointMake(MScreenWidth - self.width, point.y- self.height * 0.5);
+        }
+    }
+    return CGPointMake(0.0, 0.0);
 }
 
 @end
