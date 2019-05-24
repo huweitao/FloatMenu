@@ -136,7 +136,7 @@ const NSInteger EnlargeRatio = 4;
 @property (nonatomic, assign) CGPoint beginPoint;
 @property (nonatomic, assign) BOOL isLargeSize;
 @property (nonatomic, strong) FloatModel *itemsModel;
-@property (nonatomic, strong) NSTimer *timer;
+@property (nonatomic, strong) NSTimer *windowTimer;
 
 @end
 
@@ -168,20 +168,9 @@ const NSInteger EnlargeRatio = 4;
 
 #pragma mark - Class methods
 
-+ (void)setupDefaultItemViews
-{
-    FloatMenu *fMenu = [self createFloatMenu];
-    if (!fMenu) {
-        return;
-    }
-    
-    NSArray *itemList = [self createDefaultItems];
-    [fMenu.itemsModel addItemList:itemList];
-}
-
 + (void)showDefaultItemViews
 {
-    FloatMenu *fMenu = [self createFloatMenu];
+    FloatMenu *fMenu = [self fetchFloatMenu];
     if (!fMenu) {
         return;
     }
@@ -190,7 +179,7 @@ const NSInteger EnlargeRatio = 4;
 
 + (void)hideDefaultItemViews
 {
-    FloatMenu *fMenu = [self createFloatMenu];
+    FloatMenu *fMenu = [self fetchFloatMenu];
     if (!fMenu) {
         return;
     }
@@ -204,13 +193,23 @@ const NSInteger EnlargeRatio = 4;
         return;
     }
     
-    FloatMenu *fMenu = [self createFloatMenu];
+    FloatMenu *fMenu = [self fetchFloatMenu];
     if (fMenu) {
-        [keyWindow addSubview:fMenu];
+        [fMenu showMenu];
     }
-    
-    // refresh item view
-    [self setupDefaultItemViews];
+}
+
+
++ (void)showOnTopLevel
+{
+    UIWindow *keyWindow = [self getCurrentKeyWindow];
+    if (!keyWindow) {
+        return;
+    }
+    FloatMenu *menu = [self fetchFloatMenu];
+    if (menu) {
+        [menu showMenuAlwaysOnTop];
+    }
 }
 
 + (void)hide
@@ -220,22 +219,22 @@ const NSInteger EnlargeRatio = 4;
         return;
     }
     
-    FloatMenu *menu = [keyWindow viewWithTag:FLOATMENU_TAG];
+    FloatMenu *menu = [self fetchFloatMenu];
     if (menu) {
-        [menu removeFromSuperview];
+        [menu hideMenu];
     }
 }
 
 + (void)setupItemIndex:(NSInteger)index title:(nullable NSString *)title icon:(nullable UIImage *)icon clickHandler:(nullable void (^)(NSInteger index))handler
 {
-    FloatMenu *fMenu = [self createFloatMenu];
+    FloatMenu *fMenu = [self fetchFloatMenu];
     if (!fMenu) {
         return;
     }
     [fMenu.itemsModel resetItemAtIndex:index title:title icon:icon handler:handler];
 }
 
-+ (FloatMenu *)createFloatMenu
++ (FloatMenu *)fetchFloatMenu
 {
     UIWindow *keyWindow = [self getCurrentKeyWindow];
     if (!keyWindow) {
@@ -332,6 +331,36 @@ const NSInteger EnlargeRatio = 4;
 
 #pragma mark - Instance methods
 
+- (void)showMenuAlwaysOnTop
+{
+    if (_windowTimer) {
+        [_windowTimer invalidate];
+        _windowTimer = nil;
+    }
+    _windowTimer = [NSTimer timerWithTimeInterval:1.0 target:self selector:@selector(checkOnTopWin) userInfo:nil repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:self.windowTimer forMode:NSRunLoopCommonModes];
+    [self showMenu];
+}
+
+- (void)showMenu
+{
+    UIWindow *keyWindow = [FloatMenu getCurrentKeyWindow];
+    if (!keyWindow) {
+        return;
+    }
+    [keyWindow addSubview:self];
+    [self setupDefaultItemViews];
+}
+
+- (void)hideMenu
+{
+    if (_windowTimer) {
+        [_windowTimer invalidate];
+        _windowTimer = nil;
+    }
+    [self removeFromSuperview];
+}
+
 - (void)showDefaultItemViews
 {
     [self.itemsModel refreshItemViewsOnSuperView:self];
@@ -340,6 +369,12 @@ const NSInteger EnlargeRatio = 4;
 - (void)hideDefaultItemViews
 {
     [self.itemsModel cleanItemViews];
+}
+
+- (void)setupDefaultItemViews
+{
+    NSArray *itemList = [FloatMenu createDefaultItems];
+    [self.itemsModel addItemList:itemList];
 }
 
 #pragma mark - Private
@@ -387,6 +422,20 @@ const NSInteger EnlargeRatio = 4;
         [self showDefaultItemViews];
         self.isLargeSize = !self.isLargeSize;
     }];
+}
+
+#pragma mark - timer action
+
+- (void)checkOnTopWin
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIWindow *keyWindow = [FloatMenu getCurrentKeyWindow];
+        if (!keyWindow) {
+            return;
+        }
+        __weak typeof(self)weakSelf = self;
+        [keyWindow addSubview:weakSelf];
+    });
 }
 
 #pragma mark - Notification

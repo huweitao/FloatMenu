@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface FloatMenu : UIImageView
 
 + (void)show;
++ (void)showOnTopLevel;
 + (void)hide;
 + (void)setupItemIndex:(NSInteger)index title:(nullable NSString *)title icon:(nullable UIImage *)icon clickHandler:(nullable void (^)(NSInteger index))handler;
 
