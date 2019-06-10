@@ -6,8 +6,9 @@
 //  Copyright © 2019年 DMC. All rights reserved.
 //
 
+// float menu tag
 #define FLOATMENU_TAG 100086
-//获取屏幕宽高
+// screen size
 #define MScreenWidth  [[UIScreen mainScreen] bounds].size.width
 #define MScreenHeight [[UIScreen mainScreen] bounds].size.height
 
@@ -396,22 +397,29 @@ const NSInteger EnlargeRatio = 4;
 
 - (void)shrinkView
 {
+    if (!self.isLargeSize) {
+        return;
+    }
+    self.isLargeSize = !self.isLargeSize;
     [UIView animateWithDuration:0.2 animations:^{
         self.frame = [self shrinkViewSize:self.frame];
         // corner radious
         self.layer.cornerRadius = MenuLength / 2.0;
         self.layer.masksToBounds = YES;
-        // make menu back to screen bounds
+        // make menu attached to screen bounds
         self.origin = [self createFormatMoveFrom:self.origin];
     } completion:^(BOOL finished) {
         self.image = [Base64Images circleImage];
         [self hideDefaultItemViews];
-        self.isLargeSize = !self.isLargeSize;
     }];
 }
 
 - (void)enlargeView
 {
+    if (self.isLargeSize) {
+        return;
+    }
+    self.isLargeSize = !self.isLargeSize;
     [UIView animateWithDuration:0.2 animations:^{
         self.frame = [self enlargeViewSize:self.frame];
         // corner radious
@@ -420,7 +428,6 @@ const NSInteger EnlargeRatio = 4;
     } completion:^(BOOL finished) {
         self.image = nil;
         [self showDefaultItemViews];
-        self.isLargeSize = !self.isLargeSize;
     }];
 }
 
@@ -457,16 +464,44 @@ const NSInteger EnlargeRatio = 4;
     return _itemsModel;
 }
 
-#pragma mark - touch delegate
+#pragma mark - hittest override
 
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
+{
+    if (self.userInteractionEnabled == NO
+        || self.hidden == YES
+        || self.alpha <= 0.1) {
+        return nil;
+    }
+    CGPoint touchP = [self convertPoint:point toView:self];
+    if ([self pointInside:touchP withEvent:event]) {
+        // check subview if can respond
+        for (UIView *subView in self.subviews) {
+            CGPoint subViewPoint = [self convertPoint:point toView:subView];
+            UIView *hitSubView = [subView hitTest:subViewPoint withEvent:event];
+            if (hitSubView) {
+                return hitSubView;
+            }
+        }
+    }
+    else {
+        if (self.isLargeSize) {
+            [self shrinkView];
+        }
+        return [super hitTest:point withEvent:event];
+    }
+    return self;
+}
+
+#pragma mark - touch override
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
-    UITouch *touch = [touches anyObject];
     UIWindow *keyW = [[self class] getCurrentKeyWindow];
     if (!keyW) {
         return;
     }
+    UITouch *touch = [touches anyObject];
     self.beginPoint = [touch locationInView: keyW];
 }
 
@@ -482,7 +517,6 @@ const NSInteger EnlargeRatio = 4;
     }
     
     UITouch *touch = [touches anyObject];
-    
     CGPoint endP = [touch locationInView: keyW];
     CGPoint preP = [touch previousLocationInView: keyW];
     CGFloat offX = endP.x - preP.x;
